@@ -488,7 +488,9 @@ function renderRoster() {
   const pip = (n) => `<div class="pips">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= n ? 'f' : ''}"></i>`).join('')}</div>`;
   const shell = (k, i) => { const S = SHELLS[k]; return `<div class="kit-item"><div class="ic">${S.icon}<b>${i + 1}</b></div><div><h5>${S.name}</h5><div class="meta">${S.dmg ? 'Sát thương ' + S.dmg + ' · ' : ''}Delay ${S.delay}</div><p>${S.desc}</p></div></div>`; };
   const sk = SKILLS[D.skill], ul = ULTS[D.ult];
-  $('detail').innerHTML = `<div><canvas id="bigHero" width="400" height="400"></canvas>
+  // title screen: the hero's name over the big 3D model; the full kit opens on demand
+  $('tsHero').innerHTML = `<h2>${D.name}</h2><span class="role" style="background:${D.dark}">${D.role} · ${D.hp} máu</span><p>${D.tag}</p><button class="kitbtn" type="button">${$('detail').hidden ? 'Xem kỹ năng ▴' : 'Ẩn kỹ năng ▾'}</button>`;
+  $('detail').innerHTML = `<div>
     <div class="statbars"><span>Tấn công</span>${pip(D.stats.atk)}<span>Phòng thủ</span>${pip(D.stats.def)}<span>Khống chế</span>${pip(D.stats.ctrl)}<span>Hỗ trợ</span>${pip(D.stats.sup)}<span>Dễ chơi</span>${pip(D.stats.easy)}</div></div>
     <div><h2>${D.name}</h2><span class="role" style="background:${D.dark}">${D.role} · ${D.hp} máu</span><p class="tagline">${D.tag}</p>
     <div class="kit">
@@ -498,7 +500,25 @@ function renderRoster() {
       <div class="kit-item" style="background:#fff6d6"><div class="ic">${ul.icon}<b>R</b></div><div><h5>Tuyệt kỹ · ${ul.name}</h5><div class="meta">Cần 100 Nộ</div><p>${ul.desc}</p></div></div>
     </div></div>`;
 }
-$('roster').addEventListener('click', (e) => { const b = e.target.closest('.hcard'); if (!b) return; App.hero = b.dataset.k; store.set('hero', App.hero); SFX.init(); SFX.ui(); renderRoster(); heroChanged(); });
+/* title screen: the settings and online panels, the match summary line, the kit toggle */
+function tsPanel(id) {
+  for (const p of ['pSetup', 'pOnline']) $(p).hidden = p !== id;
+  $('menu').classList.toggle('paneled', !!id);
+}
+function tsSummary() {
+  const mapName = App.map === 'rand' ? 'Bản đồ ngẫu nhiên' : MAPS[App.map] ? MAPS[App.map].name : '';
+  $('tsSum').innerHTML = `<b>${App.perTeam}v${App.perTeam}</b> · Bot ${DIFF[App.diff].name} · Ngắm ${ASSIST[App.assist].name} · ${esc(mapName)}`;
+}
+$('menu').addEventListener('click', (e) => {
+  const t = e.target.closest('[data-panel],[data-back],[data-play],.kitbtn'); setTimeout(tsSummary, 0);
+  if (!t) return;
+  SFX.init(); SFX.ui();
+  if (t.dataset.panel) tsPanel(t.dataset.panel);
+  else if (t.hasAttribute('data-back')) tsPanel(null);
+  else if (t.hasAttribute('data-play')) { tsPanel(null); $('btnPlay').click(); }
+  else { $('detail').hidden = !$('detail').hidden; t.textContent = $('detail').hidden ? 'Xem kỹ năng ▴' : 'Ẩn kỹ năng ▾'; }
+});
+$('roster').addEventListener('click', (e) => { const b = e.target.closest('.hcard'); if (!b) return; App.hero = b.dataset.k; store.set('hero', App.hero); if (typeof r3PortraitPose === 'function') r3PortraitPose(App.hero); SFX.init(); SFX.ui(); renderRoster(); heroChanged(); });
 function animateMenu(t) {
   if ($('menu').hidden) return;
   if (gfx3D()) { // 3D models: the small cards once, the big one animated
@@ -508,7 +528,7 @@ function animateMenu(t) {
       if (r3PortraitDraw(g, c.width, c.dataset.k, -1, false, 0.3, 35)) c.dataset.r3 = ART.n;
     });
     const big = $('bigHero');
-    if (big) { const g = big.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 400, 400); r3PortraitDraw(g, 400, App.hero, 0, false, t, 35 + Math.sin(t) * 15, Math.sin(t * 0.7) > 0.6 ? 40 : 0); }
+    if (big) { const n = big.width, g = big.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, n, n); r3PortraitDraw(g, n, App.hero, 0, false, t, 35 + Math.sin(t) * 15, Math.sin(t * 0.7) > 0.6 ? 40 : 0); }
     return;
   }
   document.querySelectorAll('#roster canvas').forEach((c) => {
@@ -516,7 +536,7 @@ function animateMenu(t) {
     drawHero(g, c.dataset.k, -1, 40, 68, 1, 35, t + c.dataset.k.length, { scale: 1.05 });
   });
   const big = $('bigHero');
-  if (big) { const g = big.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 400, 400); g.scale(400 / 80, 400 / 80); drawHero(g, App.hero, 0, 40, 66, 1, 35 + Math.sin(t) * 15, t, { scale: 1.15, charge: Math.sin(t * 0.7) > 0.6 ? 40 : 0 }); }
+  if (big) { const n = big.width, g = big.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, n, n); g.scale(n / 80, n / 80); drawHero(g, App.hero, 0, 40, 66, 1, 35 + Math.sin(t) * 15, t, { scale: 1.15, charge: Math.sin(t * 0.7) > 0.6 ? 40 : 0 }); }
 }
 /* graphics: '3d' (WebGL, loaded on first use) or '2d' (the canvas renderer, also the fallback) */
 function gfx3D() {
@@ -1461,6 +1481,7 @@ function cameraTick(dt, S, local) {
   if (S.projs.length) { const p = S.projs[S.projs.length - 1]; tx = p.x; ty = p.y; speed = 6; }
   else { const a = S.heroes.find((h) => h.id === v.actorId); if (a) { tx = a.x; ty = a.y - 120; } else if (local && !local.dead) { tx = local.x; ty = local.y - 120; } }
   if (kind() === 'demo' && tx === null) { tx = W / 2; ty = H / 2; }
+  if (typeof fxCamTick === 'function') { const fc = fxCamTick(dt, S, App.freeCam > 0); if (fc.on) { tx = fc.x; ty = fc.y; speed = fc.speed; } cam.zoom *= fc.zoom; } // [FX-B] shell follow with lead, impact hold, K.O. zoom punch (visual only; free-cam wins)
   if (App.freeCam > 0) App.freeCam -= dt;
   else if (tx !== null) { cam.x += (tx - cam.x) * Math.min(1, dt * speed); cam.y += (ty - cam.y) * Math.min(1, dt * speed); }
   const hw = cssW / 2 / cam.zoom, hh = cssH / 2 / cam.zoom;
@@ -1475,7 +1496,7 @@ function renderFrame(S, local, t, dt) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   drawSky(ctx, vw, vh, { x: cam.x, zoom: z }, t, v.wind);
   // 3D: a light haze over the far background, so the islands and heroes stand out from it
-  if (g3 && TERR.map !== 'nui') { ctx.fillStyle = 'rgba(236,241,250,0.16)'; ctx.fillRect(0, 0, vw, vh); }
+  if (g3 && TERR.map !== 'nui') { ctx.fillStyle = 'rgba(236,241,250,0.07)'; ctx.fillRect(0, 0, vw, vh); }
   let sx = 0, sy = 0;
   if (shake > 0) { sx = rnd(-shake, shake) * dpr; sy = rnd(-shake, shake) * dpr; shake *= Math.pow(0.02, dt); if (shake < 0.3) shake = 0; }
   const x0 = cam.x - vw / 2 / z, x1 = cam.x + vw / 2 / z;
@@ -1509,10 +1530,10 @@ function renderFrame(S, local, t, dt) {
     // the light behind the hero whose turn it is (in 3D: on the sky layer, behind the model)
     if (tribe && isActor) { if (g3) ctx.setTransform(z, 0, 0, z, vw / 2 - cam.x * z + sx, vh / 2 - cam.y * z + sy); drawTribeAura(g3 ? ctx : g, h.key, h.x, h.y, t); }
     if (!g3) drawHero(g, h.key, h.team, h.x, h.y, face, ang, t + h.id, { walking: h.walking, hurt: h.hurtT > 0, charge: h.charge, frozen: !!(h.status.frozen || h.frozenTurn), stunned: !!(h.status.stun || h.stunnedTurn), tribe });
-    if (h.shield > 0) { g.strokeStyle = 'rgba(160,210,255,0.85)'; g.fillStyle = 'rgba(180,220,255,0.18)'; g.lineWidth = 2; g.beginPath(); g.ellipse(h.x, h.y - 26, 28, 34, 0, 0, 7); g.fill(); g.stroke(); }
+    if (h.shield > 0) { g.strokeStyle = 'rgba(160,210,255,0.85)'; g.fillStyle = 'rgba(180,220,255,0.18)'; g.lineWidth = 2; g.beginPath(); const hv = heroVis(); g.ellipse(h.x, h.y - 26 * hv, 28 * hv, 34 * hv, 0, 0, 7); g.fill(); g.stroke(); }
   }
   // 3D: shell bodies are models; the overlay adds their glow
-  for (const p of S.projs) { if (g3 && P3_KEYS.has(projKey(p)) && p.id !== undefined) { if (!p.inGround) { g.save(); g.globalCompositeOperation = 'lighter'; glow(g, p.x, p.y, 26, (SHELLS[projKey(p)] || SHELLS.cannon).col, 0.5); g.restore(); } } else drawProj(g, p, t); }
+  for (const p of S.projs) { if (g3 && P3_KEYS.has(projKey(p)) && p.id !== undefined) { /* glow: drawProjAura in render.js */ } else drawProj(g, p, t); }
   // aim guides
   const nowindFor = (h, sel) => (sel < 3 && SHELLS[HEROES[h.key].shells[sel]] && SHELLS[HEROES[h.key].shells[sel]].nowind) || !!h.calm;
   if (local && !local.dead && !local.flying) {
@@ -2205,7 +2226,7 @@ function frame(now) {
 
 /* ---------- boot ---------- */
 function boot() {
-  resize(); renderRoster(); buildMapPreviews(); renderMapPick(); setGfx(App.gfx); startDemo(); show('menu'); netInit();
+  resize(); renderRoster(); buildMapPreviews(); renderMapPick(); setGfx(App.gfx); startDemo(); show('menu'); tsSummary(); netInit();
   requestAnimationFrame(frame);
 }
 boot();
