@@ -396,6 +396,111 @@ html.g3:not(.compact) .slotbtn { width: 46px; height: 46px; font-size: 21px; bor
 html.g3:not(.compact) .stam { width: 60px; height: 46px; }
 html.g3:not(.compact) .mode { display: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+/* ---------- v3 HUD: lighter and see-through, so the fight gets the screen ---------- */
+html:not(.compact) .dock { width: min(800px, calc(100% - 24px)); padding: 7px 14px 7px; gap: 5px; border-radius: 20px;
+  background: rgba(255,250,242,.78); -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: 0 8px 24px rgba(30,20,50,.22), inset 0 1px 0 rgba(255,255,255,.7); }
+html:not(.compact) .dock-main { grid-template-columns: 82px 1fr 78px; gap: 12px; }
+html:not(.compact) .angle { height: 58px; } html:not(.compact) #angCv { width: 82px; height: 58px; }
+html:not(.compact) .angle b { font-size: 22px; }
+html:not(.compact) .powerwrap { padding-top: 13px; padding-bottom: 1px; }
+html:not(.compact) .power { height: 24px; border-width: 2.5px; border-radius: 12px; }
+html:not(.compact) .scale { font-size: 10.5px; padding-top: 2px; }
+html:not(.compact) .lastmark { font-size: 11.5px; top: -3px; } html:not(.compact) .hintmark { font-size: 11.5px; top: calc(100% - 13px); }
+html:not(.compact) .pwnum { padding: 3px 4px; border-radius: 14px; background: rgba(255,243,224,.9); }
+html:not(.compact) .pwnum b { font-size: 32px; } html:not(.compact) .pwnum small { font-size: 9px; }
+html:not(.compact) .slotbtn { width: 44px; height: 44px; font-size: 20px; border-radius: 13px; border-width: 2.5px; background: rgba(255,255,255,.92); }
+html:not(.compact) .slotbtn.mini { width: 36px; height: 36px; font-size: 16px; border-radius: 11px; }
+html:not(.compact) .stam { width: 60px; height: 44px; border-width: 2.5px; padding: 3px 6px 6px; }
+html:not(.compact) .chip { background: rgba(255,250,242,.8); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+html:not(.compact) #order { background: rgba(255,250,242,.62); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+html:not(.compact) .iconbtn { background: rgba(255,250,242,.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+/* not my turn: only the weapons row stays, small and see-through (it comes back in full on my turn) */
+.dock.waiting .dock-main { display: none; }
+.dock.waiting { opacity: .72; } .dock.waiting:hover { opacity: 1; }
+/* ---------- v3 title screen: text straight on the live demo match, the chosen hero big on the right ---------- */
+#menu.title-screen { display: block; padding: 0; overflow: hidden;
+  background: linear-gradient(90deg, rgba(28,20,48,.82) 0%, rgba(28,20,48,.5) 30%, rgba(28,20,48,.08) 50%, rgba(28,20,48,0) 60%, rgba(28,20,48,.35) 100%),
+              linear-gradient(0deg, rgba(28,20,48,.55), rgba(28,20,48,0) 34%); }
+.title-screen .menu-grid { display: grid; grid-template-columns: minmax(330px, 40%) 1fr; gap: 0; height: 100%; }
+.ts-left { position: relative; display: flex; flex-direction: column; justify-content: flex-start; gap: 0; padding: max(24px, env(safe-area-inset-top, 0px)) 24px 24px calc(48px + env(safe-area-inset-left, 0px)); overflow-y: auto; scrollbar-width: none; }
+.ts-left::-webkit-scrollbar { display: none; }
+.ts-left::before, .ts-left::after { content: ''; flex: 1 1 0; } /* centred while it fits, scrolls from the top when it doesn't */
+.ts-logo { width: min(440px, 100%); height: auto; overflow: visible; filter: drop-shadow(0 7px 0 rgba(28,20,48,.4)) drop-shadow(0 16px 28px rgba(0,0,0,.35)); animation: lgfloat 5s ease-in-out infinite; }
+.ts-logo text { font: 800 96px var(--font-display); paint-order: stroke; stroke: #fff7ea; stroke-width: 15px; stroke-linejoin: round; letter-spacing: -1px; }
+.ts-logo .lg-b { font-size: 118px; }
+.ts-logo .lg-cloud ellipse { fill: #fff; opacity: .92; }
+@keyframes lgfloat { 50% { transform: translateY(-5px); } }
+.ts-tag { margin: 4px 0 14px; color: #fff4e2; font-weight: 800; font-size: 15px; text-shadow: 0 2px 8px rgba(0,0,0,.6); }
+.title-screen .online-line { margin: -4px 0 12px; } .title-screen .olbtn { width: auto; background: rgba(227,247,236,.92); }
+.ts-name { width: 270px; border-radius: 999px; padding: 10px 16px; background: rgba(255,250,242,.94); border: 2px solid rgba(255,255,255,.6); }
+.ts-nav { display: flex; flex-direction: column; align-items: flex-start; margin-top: 8px; }
+.ts-item { position: relative; border: 0; background: none; padding: 3px 0 3px 30px; cursor: pointer; text-align: left; color: #fff7ea;
+  font: 800 28px/1.15 var(--font-display); text-shadow: 0 3px 0 rgba(28,20,48,.7), 0 6px 18px rgba(0,0,0,.45); transition: transform .15s, color .15s; }
+.ts-item::before { content: '▸'; position: absolute; left: 4px; opacity: 0; transform: translateX(-8px); transition: opacity .15s, transform .15s; color: var(--gold); }
+.ts-item:hover, .ts-item:focus-visible { color: var(--gold); transform: translateX(6px); outline: none; }
+.ts-item:hover::before, .ts-item:focus-visible::before { opacity: 1; transform: none; }
+.ts-item:active { transform: translateX(6px) scale(.97); }
+.ts-item.ts-play { font-size: 44px; color: #ffd27a; margin-top: 6px; }
+.ts-item.ts-play::before { opacity: 1; transform: none; color: var(--coral); }
+.ts-sum { margin: -2px 0 10px 32px; color: rgba(255,247,234,.82); font-weight: 800; font-size: 13px; text-shadow: 0 2px 6px rgba(0,0,0,.6); }
+.ts-sum b { color: #ffd27a; }
+/* settings and online: a frosted panel over the left side */
+.ts-panel { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; max-width: 430px; padding: 16px; border-radius: 22px;
+  background: rgba(255,250,242,.9); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 16px 40px rgba(20,10,40,.35); animation: tsin .2s ease-out; }
+.ts-panel h3 { margin: 0; font: 800 22px var(--font-display); }
+.ts-back { align-self: flex-start; border: 0; background: none; font: 900 14px var(--font-body); color: var(--ink-soft); cursor: pointer; padding: 0; }
+@keyframes tsin { from { opacity: 0; transform: translateX(-14px); } }
+.title-screen.paneled .ts-nav, .title-screen.paneled .ts-name, .title-screen.paneled .online-line, .title-screen.paneled .ts-tag { display: none !important; }
+.title-screen.paneled .ts-logo { width: min(300px, 70%); }
+.title-screen.paneled .ts-foot { display: none; }
+/* the chosen hero, big on the right; the roster below it */
+.ts-right { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 16px calc(24px + env(safe-area-inset-right, 0px)) max(18px, env(safe-area-inset-bottom, 0px)) 0; min-height: 0; }
+#bigHero { width: min(56vh, 92%); aspect-ratio: 1; height: auto; margin-bottom: -22px; filter: drop-shadow(0 18px 24px rgba(20,10,40,.45)); }
+.ts-hero { text-align: center; color: #fff7ea; text-shadow: 0 3px 0 rgba(28,20,48,.7), 0 6px 18px rgba(0,0,0,.45); margin-bottom: 10px; position: relative; }
+.ts-hero h2 { margin: 0; font: 800 46px/1 var(--font-display); }
+.ts-hero .role { margin: 6px 0 4px; text-shadow: none; }
+.ts-hero p { margin: 0; font-weight: 800; font-size: 14px; max-width: 460px; }
+.ts-hero .kitbtn { margin-top: 8px; border: 0; border-radius: 999px; padding: 6px 14px; background: rgba(255,250,242,.92); color: var(--ink); font: 900 13px var(--font-body); cursor: pointer; text-shadow: none; }
+.title-screen .roster { grid-template-columns: repeat(5, 92px); gap: 8px; justify-content: center; }
+.title-screen .hcard { padding: 4px 4px 6px; border-width: 2px; border-color: rgba(255,255,255,.5); background: rgba(255,250,242,.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.title-screen .hcard.on { border-color: var(--gold); background: rgba(255,243,209,.92); box-shadow: 0 0 0 3px rgba(255,197,61,.45); }
+.title-screen .hcard b { font-size: 14px; } .title-screen .hcard small { font-size: 9.5px; }
+.title-screen .detail { position: absolute; right: calc(24px + env(safe-area-inset-right, 0px)); top: max(16px, env(safe-area-inset-top, 0px)); width: min(560px, 92%); max-height: calc(100% - 300px); overflow-y: auto; display: block; margin: 0;
+  background: rgba(255,250,242,.94); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 0; box-shadow: 0 16px 40px rgba(20,10,40,.35); animation: tsin .2s ease-out; z-index: 2; }
+.title-screen .detail[hidden] { display: none; }
+.title-screen .detail .kit { grid-template-columns: 1fr; }
+.ts-foot { position: absolute; left: calc(48px + env(safe-area-inset-left, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); color: rgba(255,247,234,.6); font: 800 11.5px var(--font-body); }
+.title-screen .menu-grid.picking { grid-template-columns: 1fr; } .title-screen .menu-grid.picking .ts-left { display: none; }
+@media (max-width: 900px), (max-height: 520px) {
+  .ts-logo { width: min(300px, 100%); } .ts-item { font-size: 22px; } .ts-item.ts-play { font-size: 32px; }
+  .title-screen .roster { grid-template-columns: repeat(5, 66px); gap: 5px; } .title-screen .hcard b { font-size: 11px; } .title-screen .hcard small { display: none; }
+  .ts-hero h2 { font-size: 30px; } .ts-hero p { display: none; } #bigHero { width: min(46vh, 80%); }
+  .ts-left { padding-left: calc(24px + env(safe-area-inset-left, 0px)); }
+}
+@media (max-height: 520px) and (orientation: landscape) { /* phones on their side: everything must fit above the fold */
+  .ts-logo { width: min(230px, 100%); } .ts-tag, .ts-foot { display: none; }
+  .title-screen .online-line { margin: 2px 0 6px; } .title-screen .olbtn { padding: 3px 10px; font-size: 12.5px; } .title-screen .olbtn b { font-size: 14px; }
+  .ts-name { padding: 7px 14px; font-size: 14px; width: 230px; } .ts-nav { margin-top: 2px; }
+  .ts-item { font-size: 20px; } .ts-item.ts-play { font-size: 30px; margin-top: 2px; } .ts-sum { font-size: 11.5px; margin-bottom: 4px; }
+  #bigHero { width: min(52vh, 70%); }
+}
+@media (orientation: portrait) {
+  #menu.title-screen { overflow-y: auto; background: linear-gradient(0deg, rgba(28,20,48,.88) 0%, rgba(28,20,48,.55) 45%, rgba(28,20,48,.2) 100%); }
+  .title-screen .menu-grid { grid-template-columns: 1fr; height: auto; }
+  .ts-left { order: 2; align-items: center; text-align: center; padding: 8px 18px 28px; overflow: visible; }
+  .ts-right { order: 1; padding: max(14px, env(safe-area-inset-top, 0px)) 12px 0; }
+  .ts-nav { align-items: center; } .ts-item, .ts-item.ts-play { padding-left: 0; } .ts-item::before { display: none; } .ts-item:hover { transform: none; }
+  .ts-sum { margin-left: 0; } .ts-name { margin: 0 auto; text-align: center; }
+  .ts-logo { width: min(250px, 70%); margin: 0 auto; } #bigHero { width: min(30vh, 66vw); margin-bottom: -14px; }
+  .title-screen .menu-grid { min-height: 100%; align-content: space-between; }
+  .ts-item { font-size: 26px; } .ts-item.ts-play { font-size: 42px; } .ts-sum { font-size: 12.5px; margin-bottom: 8px; }
+  .ts-tag { font-size: 13.5px; margin-bottom: 10px; } .ts-name { width: min(300px, 90%); padding: 11px 16px; font-size: 16px; }
+  .ts-hero h2 { font-size: 30px; } .ts-hero p { display: none; } .ts-tag { display: none; }
+  .title-screen .roster { grid-template-columns: repeat(5, minmax(0, 68px)); gap: 6px; } .title-screen .hcard b { font-size: 11.5px; }
+  .ts-panel { max-width: 100%; text-align: left; } .ts-foot { display: none; }
+  .title-screen .detail { position: static; width: 100%; margin-top: 10px; }
+}
 </style>
 
 <div id="app">
@@ -452,45 +557,59 @@ html.g3:not(.compact) .mode { display: none; }
     </div>
   </div>
 
-  <div id="menu" class="screen">
-    <div class="panel">
-      <div class="openrooms" id="openRooms" hidden></div>
-      <div class="menu-grid">
-        <div class="col">
-          <h1 class="title">Pháo Đài <span>Mây</span><small>Bắn tọa độ theo lượt · chơi theo đội</small></h1>
-          <p class="note">Mỗi vòng, từng đội lần lượt ra tay. Trong đội, ai có delay thấp hơn được đi trước. Canh gió, chọn góc và lực, phối hợp combo để thổi bay đối thủ khỏi đảo mây.</p>
-          <div class="col" style="gap:6px"><span class="label">Tên của bạn</span><input id="nameIn" class="input" maxlength="14" placeholder="Nhập tên"></div>
+  <div id="menu" class="screen title-screen">
+    <div class="menu-grid">
+      <div class="col ts-left">
+        <div class="openrooms" id="openRooms" hidden></div>
+        <svg class="ts-logo" viewBox="0 0 520 210" role="img" aria-label="Pháo Đài Mây">
+          <defs><linearGradient id="lgSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd3ff"/><stop offset="1" stop-color="#3d8ef0"/></linearGradient>
+            <linearGradient id="lgSun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3a0"/><stop offset="1" stop-color="#ff8a2a"/></linearGradient></defs>
+          <g class="lg-cloud"><ellipse cx="400" cy="160" rx="86" ry="34"/><ellipse cx="350" cy="168" rx="56" ry="26"/><ellipse cx="452" cy="170" rx="50" ry="22"/></g>
+          <text x="8" y="92" class="lg-a" fill="url(#lgSun)">Pháo Đài</text>
+          <text x="150" y="192" class="lg-b" fill="url(#lgSky)">Mây</text>
+        </svg>
+        <p class="ts-tag">Bắn tọa độ theo lượt · chơi theo đội · combo nguyên tố</p>
+        <p class="online-line" id="onlineLine" hidden><button class="olbtn" id="btnOnline"><i class="dot"></i><b id="onlineN">1</b><span id="onlineTxt"> người đang online</span><em>Xem ›</em></button></p>
+        <input id="nameIn" class="input ts-name" maxlength="14" placeholder="Tên của bạn">
+        <nav class="ts-nav" id="tsNav">
+          <button class="ts-item ts-play" id="btnPlay">Vào trận</button>
+          <div class="ts-sum" id="tsSum"></div>
+          <button class="ts-item" data-panel="pSetup">Tuỳ chỉnh trận</button>
+          <button class="ts-item" data-panel="pOnline">Chơi online</button>
+          <button class="ts-item" id="btnHelpMenu">Cách chơi</button>
+        </nav>
+        <section class="ts-panel" id="pSetup" hidden>
+          <button class="ts-back" data-back>← Quay lại</button>
+          <h3>Tuỳ chỉnh trận</h3>
           <div class="gfxrow"><span class="label">Đồ hoạ</span><div class="seg gfxSeg"><button data-g="3d">3D <b>mới</b></button><button data-g="2d">2D · nhẹ</button></div></div>
-          <div class="box">
-            <h3>Chơi với bot</h3>
-            <div class="row"><span class="label" style="width:64px">Chế độ</span><div class="seg" id="modeSeg"><button data-v="1">1v1</button><button data-v="2" class="on">2v2</button><button data-v="3">3v3</button></div></div>
-            <div class="row"><span class="label" style="width:64px">Bot</span><div class="seg" id="diffSeg"><button data-v="0">Dễ</button><button data-v="1" class="on">Thường</button><button data-v="2">Khó</button></div></div>
-            <div class="row"><span class="label" style="width:64px">Ngắm</span><div class="seg" id="assistSeg"><button data-v="0">Dễ</button><button data-v="1" class="on">Vừa</button><button data-v="2">Khó · tự tính</button></div></div>
-            <p class="note" id="assistDesc"></p>
-            <span class="label">⭐ Map đặc biệt</span>
-            <button class="mspecial" id="mapSpecial" type="button"></button>
-            <p class="note" id="mapSpecialDesc" hidden></p>
-            <span class="label">Bản đồ thường</span>
-            <div class="maps" id="mapPick"></div>
-            <p class="note" id="mapDesc"></p>
-            <button class="btn gold" id="btnPlay">Vào trận</button>
-          </div>
-          <div class="box">
-            <h3>Chơi online</h3>
-            <p class="note" id="netNote">Đang kiểm tra kết nối…</p>
-            <p class="online-line" id="onlineLine" hidden><button class="olbtn" id="btnOnline"><i class="dot"></i><b id="onlineN">1</b><span id="onlineTxt"> người đang online</span><em>Xem ›</em></button></p>
-            <button class="btn mint" id="btnHost">Tạo phòng</button>
-            <div class="row"><input id="codeIn" class="input" maxlength="200" placeholder="Mã phòng hoặc link mời" autocomplete="off" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase"><button class="btn" id="btnJoin">Vào</button></div>
-          </div>
-          <button class="btn small" id="btnHelpMenu" style="align-self:flex-start">Cách chơi, combo và vật phẩm</button>
-        </div>
-        <div class="col">
-          <span class="label">Chọn tướng</span>
-          <div class="roster" id="roster"></div>
-          <div class="detail" id="detail"></div>
-        </div>
+          <div class="row"><span class="label" style="width:64px">Chế độ</span><div class="seg" id="modeSeg"><button data-v="1">1v1</button><button data-v="2" class="on">2v2</button><button data-v="3">3v3</button></div></div>
+          <div class="row"><span class="label" style="width:64px">Bot</span><div class="seg" id="diffSeg"><button data-v="0">Dễ</button><button data-v="1" class="on">Thường</button><button data-v="2">Khó</button></div></div>
+          <div class="row"><span class="label" style="width:64px">Ngắm</span><div class="seg" id="assistSeg"><button data-v="0">Dễ</button><button data-v="1" class="on">Vừa</button><button data-v="2">Khó · tự tính</button></div></div>
+          <p class="note" id="assistDesc"></p>
+          <span class="label">⭐ Map đặc biệt</span>
+          <button class="mspecial" id="mapSpecial" type="button"></button>
+          <p class="note" id="mapSpecialDesc" hidden></p>
+          <span class="label">Bản đồ thường</span>
+          <div class="maps" id="mapPick"></div>
+          <p class="note" id="mapDesc"></p>
+          <button class="btn gold" data-play>Vào trận</button>
+        </section>
+        <section class="ts-panel" id="pOnline" hidden>
+          <button class="ts-back" data-back>← Quay lại</button>
+          <h3>Chơi online</h3>
+          <p class="note" id="netNote">Đang kiểm tra kết nối…</p>
+          <button class="btn mint" id="btnHost">Tạo phòng</button>
+          <div class="row"><input id="codeIn" class="input" maxlength="200" placeholder="Mã phòng hoặc link mời" autocomplete="off" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase"><button class="btn" id="btnJoin">Vào</button></div>
+        </section>
+      </div>
+      <div class="col ts-right">
+        <canvas id="bigHero" width="640" height="640" aria-hidden="true"></canvas>
+        <div class="ts-hero" id="tsHero"></div>
+        <div class="roster" id="roster"></div>
+        <div class="detail" id="detail" hidden></div>
       </div>
     </div>
+    <div class="ts-foot">Pháo Đài Mây · v3</div>
   </div>
 
   <div id="lobby" class="screen" hidden>
